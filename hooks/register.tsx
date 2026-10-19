@@ -152,8 +152,7 @@ function labelOf(modelId: string): string {
   return tier ? MODELS[tier].label.split(' ')[0] : modelId
 }
 
-async function paint($: EngineInterface) {
-  const [m, r, sp] = await Promise.all([read($, mode), read($, route), read($, spend)])
+function summary(m: Mode, r: Route | null, sp: Spend): string {
   const head =
     m === 'off'
       ? 'Router aus'
@@ -166,7 +165,13 @@ async function paint($: EngineInterface) {
     .map(([id, v]) => `${labelOf(id)} ${usd(v)}`)
     .join(' · ')
   const money = sp.requests ? ` │ Turn ${usd(sp.lastTurn)} │ Σ ${usd(sp.total)}${top ? ` (${top})` : ''}` : ''
-  $.ui.status(`⇢ ${head}${money}`)
+  return `⇢ ${head}${money}`
+}
+
+// Terminal: Statuszeile unter dem Prompt. Desktop und andere Oberflächen: Band über dem Prompt (siehe ui.render).
+async function paint($: EngineInterface) {
+  const [m, r, sp] = await Promise.all([read($, mode), read($, route), read($, spend)])
+  $.ui.status(summary(m, r, sp))
 }
 
 // ── Hooks ──────────────────────────────────────────────────────────────────
@@ -228,6 +233,17 @@ export const register: Register = on => {
       await paint($)
     }
     return res
+  })
+
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    if (e.surface === 'terminal') return next(e) // dort zeigt die Statuszeile dasselbe
+    const [m, r, sp] = await Promise.all([read($, mode), read($, route), read($, spend)])
+    const { Box, Text } = $.ui.resolve(e)
+    return (
+      <Box>
+        <Text dimColor>{summary(m, r, sp)}</Text>
+      </Box>
+    )
   })
 
   on('command.run', { command: 'route' }, async ($, e) => {
