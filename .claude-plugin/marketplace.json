@@ -1,0 +1,5 @@
+{
+  "name": "malagant-mods",
+  "owner": { "name": "malagant" },
+  "plugins": [{ "name": "model-router", "source": "./" }]
+}

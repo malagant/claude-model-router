@@ -1,0 +1,6 @@
+{
+  "name": "model-router",
+  "version": "0.1.0",
+  "description": "Wählt pro Prompt automatisch das passende Claude-Modell und zeigt die tatsächlich angefallenen API-Kosten in der Statuszeile.",
+  "types": "./types/index.d.ts"
+}
