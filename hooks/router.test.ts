@@ -2,7 +2,7 @@ import { expect, test } from 'claude-code/testing'
 
 import { decide, priceOf } from './register'
 
-test('routet nach Aufgabe', () => {
+test('routes by task', () => {
   expect(decide('Refactor die Crossplane-Compositions und migriere die Provider', null).tier).toBe('opus')
   expect(decide('Klassifiziere diese Tickets als JSON', null).tier).toBe('haiku')
   expect(decide('Schreib ein Bash-Script, das die Pods neu startet', null).tier).toBe('sonnet')
@@ -12,7 +12,7 @@ test('routet nach Aufgabe', () => {
   expect(decide('ja, mach weiter', prev).tier).toBe('opus')
 })
 
-test('rechnet Listenpreise', () => {
+test('computes list prices', () => {
   const u = { input_tokens: 1_000_000, output_tokens: 1_000_000, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 }
   expect(Math.round(priceOf('claude-opus-5-5', u) * 1e6) / 1e6).toBe(24)
   expect(Math.round(priceOf('claude-sonnet-5-5', u) * 1e6) / 1e6).toBe(12)
@@ -20,7 +20,7 @@ test('rechnet Listenpreise', () => {
   expect(Math.round(priceOf('claude-haiku-5-5', { ...u, input_tokens: 200_000, output_tokens: 0 }) * 1e6) / 1e6).toBe(0.1)
 })
 
-test('setzt Modell im Turn und zählt Kosten', async ($, on) => {
+test('switches the model for a turn and counts cost', async ($, on) => {
   const seen: { model: string; effort?: unknown }[] = []
   on('prompt.submit', ($, e) => ({ text: e.text }))
   on('turn.start', ($, e) => ({ turnId: e.turnId }))

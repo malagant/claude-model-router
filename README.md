@@ -1,53 +1,62 @@
 # model-router
 
-Ein Claude-Code-Mod, der pro Prompt automatisch das passende Claude-Modell samt Effort wählt und die tatsächlich angefallenen API-Kosten in der Statuszeile anzeigt.
+A Claude Code mod that picks the right Claude model and effort level for every prompt, and shows the actual API cost of the session as it happens.
 
 ```
-⇢ Opus 5.5 · high · refactor, migrier │ Turn $0.08 │ Σ $3.41 (Opus $2.90 · Sonnet $0.51)
+⇢ Opus 5.5 · high · refactor, migrate │ Turn $0.08 │ Σ $3.41 (Opus $2.90 · Sonnet $0.51)
 ```
+
+In the terminal this appears in the status line below the prompt. In the desktop app it appears as a band above the prompt.
 
 ## Installation
 
-Im Prompt einer Terminal-Session:
+In a terminal session, at the prompt:
 
 ```
 /plugin install model-router --marketplace malagant/claude-model-router
 ```
 
-Aus der Shell:
+From the shell:
 
 ```
 claude plugin install model-router --marketplace malagant/claude-model-router
 ```
 
-In der Desktop-App, wo `/plugin` nicht läuft: Plus neben dem Prompt, dann Plugins, Add marketplace mit `malagant/claude-model-router`, dann Add plugin.
+In the desktop app, where `/plugin` does not run: click + next to the prompt box, then Plugins → Add marketplace, enter `malagant/claude-model-router`, then Add plugin.
 
 ## Routing
 
-| Modell | Typische Aufgaben |
+| Model | Typical tasks |
 | --- | --- |
-| Haiku 5.5 | Klassifizieren, Extrahieren, Übersetzen, Formatieren, kurze Fragen |
-| Sonnet 5.5 | Standard: Code, Scripts, Reviews, Helm/Terraform, Mails |
-| Opus 5.5 | Refactoring, Migration, Architektur, Root Cause, Security, lange Prompts |
-| Fable 5.1 | Deep Research, umfassende End-to-End-Aufgaben, sehr lange Prompts |
+| Haiku 5.5 | Classification, extraction, translation, formatting, short questions |
+| Sonnet 5.5 | Default: code, scripts, reviews, Helm/Terraform, writing |
+| Opus 5.5 | Refactoring, migrations, architecture, root-cause analysis, security, long prompts |
+| Fable 5.1 | Deep research, comprehensive end-to-end work, very long prompts |
 
-Kurze Folge-Prompts („ja, mach weiter“) behalten das vorige Modell, damit der Prompt-Cache nicht verfällt. `@opus`, `@sonnet`, `@haiku` oder `@fable` im Prompt überstimmt den Router für diesen einen Prompt. Subagents behalten ihr eigenes Modell.
+- Short follow-up prompts such as "ok, continue" keep the previous model, so the prompt cache is not invalidated by a model switch.
+- `@opus`, `@sonnet`, `@haiku` or `@fable` anywhere in a prompt overrides the router for that prompt only. The hint is removed before the prompt is sent.
+- Subagents keep their own model. Their cost is included in the session total.
+- Routing is keyword-based and runs locally, so it adds no latency and no extra API calls. Keywords are matched in English and German. If it picks the wrong model, use an `@` hint.
 
-## Befehle
+## Commands
 
-- `/route` zeigt Modus, aktuelle Wahl und Kosten pro Modell
-- `/route auto` automatisches Routing
-- `/route opus|sonnet|haiku|fable` ein Modell fest einstellen
-- `/route off` Router aus
-- `/route reset` Kostenzähler zurücksetzen
+- `/route` shows the current mode, the chosen model and the cost per model
+- `/route auto` automatic routing (default)
+- `/route opus`, `/route sonnet`, `/route haiku`, `/route fable` pin one model
+- `/route off` disable the router and use the session's configured model
+- `/route reset` reset the cost counter
 
-## Kosten
+## Cost
 
-Die Kosten werden aus den Usage-Daten jeder API-Antwort mit Listenpreisen berechnet (Oktober 2026), inklusive Cache-Reads und -Writes und dem höheren Haiku-5.5-Satz über 100k Prompt-Tokens. Gebühren für Websuche sind nicht enthalten. Die Preise stehen in `hooks/register.ts` und müssen bei Preisänderungen dort nachgezogen werden.
+Costs are computed from the usage data of every API response, using list prices (October 2026). Cache reads and writes are included, and so is the higher Haiku 5.5 tier for prompts over 100k tokens. Web search fees are not included. Prices live in `hooks/register.tsx`; update them there when list prices change.
 
-## Entwicklung
+## Development
 
 ```
 claude plugin validate .
 claude plugin test .
 ```
+
+## License
+
+No license file is included yet, so all rights are reserved by default.

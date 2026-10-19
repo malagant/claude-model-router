@@ -1,5 +1,11 @@
 {
   "name": "malagant-mods",
   "owner": { "name": "malagant" },
-  "plugins": [{ "name": "model-router", "source": "./" }]
+  "plugins": [
+    {
+      "name": "model-router",
+      "source": "./",
+      "description": "Automatic per-prompt model routing with live API cost tracking."
+    }
+  ]
 }
